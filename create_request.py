@@ -54,13 +54,13 @@ def get_productdata(link):
     categories = []
     for cat in v:
         if cat.startswith("product_cat-"):
-            categories.append(cat)
+            categories.append(cat.split("product_cat-", 1)[1])
 
     # get image link
     image_link = False
     v = r.html.find('.woocommerce-product-gallery__image', first=True).attrs['data-thumb']
     if v is not None:
-        image_link = v.split("?", 1)[0]
+        image_link = v.split("?", 1)[0] # using split to remove query strings
 
     # add details to product dict
     product = {
