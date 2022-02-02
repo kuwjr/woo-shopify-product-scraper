@@ -18,21 +18,64 @@ def get_links(url):
 # Method to visit single product and extract data
 def get_productdata(link):
     r = s.get(link)
-    title = r.html.find('.product_title', first=True).text
-    mint_installment = r.html.find('.product-price-installments > b', first=True).text
-    price = r.html.find('.woocommerce-Price-amount.amount bdi', first=True).text  
-    short_desc = r.html.find('.woocommerce-product-details__short-description', first=True).text
-    
-    # search for `product_cat-*`
-    cat = r.html.find('.product_cat-*', first=True)
-    print("price: ", cat)
-    # image_link = r.html.find('.woocommerce-product-gallery__image', first=True).attrs['href']
-    # tag = r.html.find('a[rel=tag]', first=True).text
-    # sku = r.html.find('span.sku', first=True).full_text
 
+    # get title if available
+    title = False
+    v = r.html.find('.product_title', first=True)
+    if v is not None:
+        title = v.text
+
+    # get mintpay installment if found
+    mint_installment = False
+    v = r.html.find('.product-price-installments > b', first=True)
+    if v is not None:
+        mint_installment = v.text
+
+    # get product price if found
+    price = False
+    v = r.html.find('.woocommerce-Price-amount.amount', first=True)
+    if v is not None:
+        price = v.text
+    
+    # there are 2 types of classes for short_desc
+    sd1 = r.html.find('.woocommerce-product-details__short-description', first=True)
+    sd2 = r.html.find('.product-short-description', first=True, clean=True)
+
+    short_desc = False
+
+    if sd1 is not None:
+        short_desc = sd1.text
+
+    if sd2 is not None:
+        short_desc = sd2.text
+
+    # search for `product_cat-*`
+    v = r.html.find('.product.type-product', first=True).attrs['class']
+    categories = []
+    for cat in v:
+        if cat.startswith("product_cat-"):
+            categories.append(cat)
+
+    # get image link
+    image_link = False
+    v = r.html.find('.woocommerce-product-gallery__image', first=True).attrs['data-thumb']
+    if v is not None:
+        image_link = v.split("?", 1)[0]
+
+    # add details to product dict
+    product = {
+        'name': title,
+        'price': price,
+        'mint_installment': mint_installment,
+        'description': short_desc,
+        'categories': categories,
+        'image': image_link
+    }
+
+    print("PRODUCT: ", product)
 
 # execution
-url = 'https://theparfumerie.lk/shop/'
+url = 'https://themes.woocommerce.com/storefront/shop/'
 links = get_links(url)
 
 results = []
