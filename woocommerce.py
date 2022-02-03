@@ -1,6 +1,4 @@
 from requests_html import HTMLSession
-import csv
-import time
 
 s = HTMLSession()
 
@@ -73,12 +71,3 @@ def get_productdata(link):
     }
 
     print("PRODUCT: ", product)
-
-# execution
-url = 'https://themes.woocommerce.com/storefront/shop/'
-links = get_links(url)
-
-results = []
-for link in links:
-    results.append(get_productdata(link))
-    time.sleep(1)
